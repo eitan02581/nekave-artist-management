@@ -11,12 +11,6 @@ const SECTION_KEYS = [
 
 const FRAME_COUNT = 120;
 
-function shouldUseFallback() {
-  if (typeof window === "undefined") return true;
-  // Use direct video scrub on all devices — lighter and works everywhere
-  return true;
-}
-
 export default function VideoScrollSection() {
   const { t } = useI18n();
   const sections = SECTION_KEYS.map((s) => ({
@@ -32,16 +26,40 @@ export default function VideoScrollSection() {
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
-  const [useFallback, setUseFallback] = useState(false);
+  const [mobile, setMobile] = useState(false);
 
-  // ── Decide strategy on mount ──
+  // ── Detect device and set up video strategy ──
   useEffect(() => {
-    if (shouldUseFallback()) {
-      // Mobile: use direct video scrub (no frame extraction)
-      setUseFallback(true);
-      setLoaded(true);
+    const isMobileDevice =
+      window.innerWidth < 768 ||
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    setMobile(isMobileDevice);
+
+    if (isMobileDevice) {
+      // Mobile: use direct video element with iOS play/pause buffer trick
+      const video = videoRef.current;
+      if (video) {
+        // Force iOS Safari to buffer the video by briefly playing it
+        const tryBuffer = () => {
+          video.play().then(() => {
+            video.pause();
+            video.currentTime = 0;
+            setLoaded(true);
+          }).catch(() => {
+            // Even if play fails, mark as loaded — seeking may still work
+            setLoaded(true);
+          });
+        };
+
+        if (video.readyState >= 2) {
+          tryBuffer();
+        } else {
+          video.addEventListener("loadeddata", tryBuffer, { once: true });
+        }
+      }
     } else {
-      // Desktop: extract frames into canvas cache
+      // Desktop: extract frames into ImageBitmap cache for smooth canvas scrub
       let cancelled = false;
 
       async function extractFrames() {
@@ -70,7 +88,6 @@ export default function VideoScrollSection() {
           if (cancelled) return;
 
           video.currentTime = (i / (FRAME_COUNT - 1)) * duration;
-
           await new Promise<void>((resolve) => {
             video.onseeked = () => resolve();
           });
@@ -92,18 +109,16 @@ export default function VideoScrollSection() {
       }
 
       extractFrames().catch(() => {
-        // If frame extraction fails (memory), fall back to video scrub
-        setUseFallback(true);
+        // If extraction fails (memory), fall back to video scrub
+        setMobile(true);
         setLoaded(true);
       });
 
-      return () => {
-        cancelled = true;
-      };
+      return () => { cancelled = true; };
     }
   }, []);
 
-  // ── Draw a specific frame to canvas (desktop only) ──
+  // ── Draw a cached frame to canvas (desktop) ──
   const drawFrame = useCallback((index: number) => {
     const canvas = canvasRef.current;
     const frames = framesRef.current;
@@ -143,14 +158,12 @@ export default function VideoScrollSection() {
 
         setProgress(clamped);
 
-        if (useFallback) {
-          // Mobile: scrub video directly
+        if (mobile) {
           const video = videoRef.current;
           if (video && video.duration && isFinite(video.duration)) {
             video.currentTime = clamped * video.duration;
           }
         } else {
-          // Desktop: draw cached frame
           const frameIndex = Math.round(clamped * (FRAME_COUNT - 1));
           drawFrame(frameIndex);
         }
@@ -164,7 +177,7 @@ export default function VideoScrollSection() {
       window.removeEventListener("scroll", onScroll);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [drawFrame, useFallback]);
+  }, [drawFrame, mobile]);
 
   // ── Text calculations ──
   const getTextOpacity = (index: number) => {
@@ -189,38 +202,34 @@ export default function VideoScrollSection() {
   };
 
   return (
-    <section
-      ref={containerRef}
-      className="relative h-[250vh]"
-    >
+    <section ref={containerRef} className="relative h-[250vh]">
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
-        {/* Desktop: canvas for cached frames */}
-        {!useFallback && (
-          <canvas
-            ref={canvasRef}
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              imageRendering: "auto",
-              opacity: loaded ? 1 : 0,
-              transition: "opacity 0.6s ease",
-            }}
-          />
-        )}
+        {/* Desktop: canvas for cached frames (smooth 120-frame scrub) */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            imageRendering: "auto",
+            opacity: !mobile && loaded ? 1 : 0,
+            transition: "opacity 0.6s ease",
+          }}
+        />
 
-        {/* Mobile: direct video element */}
-        {useFallback && (
-          <video
-            ref={videoRef}
-            src="/paint-scroll.mp4"
-            muted
-            playsInline
-            preload="auto"
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ pointerEvents: "none" }}
-          />
-        )}
+        {/* Mobile: video element with iOS buffer trick */}
+        <video
+          ref={videoRef}
+          src="/paint-scroll.mp4"
+          muted
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            pointerEvents: "none",
+            opacity: mobile ? 1 : 0,
+          }}
+        />
 
-        {/* Loading state (desktop only) */}
+        {/* Loading state (desktop frame extraction) */}
         {!loaded && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
             <div className="w-48 h-[1px] bg-white/10 rounded-full overflow-hidden">
