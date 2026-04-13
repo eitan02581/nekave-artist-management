@@ -38,7 +38,7 @@ export default function Header() {
             NEKAVE
           </span>
           <span className="font-body text-[8px] uppercase tracking-[0.15em] text-charcoal">
-            Artist Management
+            Artists Management
           </span>
         </div>
       </Link>

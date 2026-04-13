@@ -17,11 +17,11 @@ const aileron = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: "NEKAVE Artist Management",
+    default: "NEKAVE Artists Management",
     template: "%s | NEKAVE",
   },
   description:
-    "Representing contemporary painters and sculptors. NEKAVE Artist Management connects exceptional artists with galleries, collectors, and institutions worldwide.",
+    "Representing contemporary painters and sculptors. NEKAVE Artists Management connects exceptional artists with galleries, collectors, and institutions worldwide.",
 };
 
 export default function RootLayout({

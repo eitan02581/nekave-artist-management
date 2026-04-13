@@ -53,7 +53,7 @@ export async function POST(request: Request) {
             <p style="margin: 0; color: #1a1a1a; white-space: pre-wrap;">${message}</p>
           </div>
           <p style="margin-top: 24px; font-size: 12px; color: #999;">
-            Sent from the NEKAVE Artist Management website contact form.
+            Sent from the NEKAVE Artists Management website contact form.
           </p>
         </div>
       `,

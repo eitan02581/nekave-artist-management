@@ -25,6 +25,7 @@ export default function Footer() {
           {/* Contact links */}
           <div className="flex items-center gap-6">
             <a
+              dir="ltr"
               href="tel:+972549410057"
               className="font-mono text-xs text-silver transition-colors duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-charcoal"
             >

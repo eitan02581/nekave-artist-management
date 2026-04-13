@@ -109,6 +109,7 @@ export default function HomePage() {
 
           <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10">
             <a
+              dir="ltr"
               href="tel:+972549410057"
               className="group flex items-center gap-3 font-body text-sm uppercase tracking-wider text-charcoal hover:text-gold transition-colors duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
             >

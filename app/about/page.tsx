@@ -51,13 +51,13 @@ export default function AboutPage() {
 
           <ScrollReveal variant="fade-up" delay={0.1}>
             <h1 className="font-display text-4xl md:text-5xl font-light text-black tracking-wide mb-10">
-              NEKAVE Artist Management
+              NEKAVE Artists Management
             </h1>
           </ScrollReveal>
 
           <ScrollReveal variant="fade-up" delay={0.2}>
             <p className="font-body text-lg leading-relaxed text-charcoal/80 mb-6">
-              Founded in Tel Aviv, NEKAVE Artist Management represents a
+              Founded in Tel Aviv, NEKAVE Artists Management represents a
               carefully curated roster of contemporary painters and sculptors
               whose work challenges and redefines the boundaries of their
               respective mediums.

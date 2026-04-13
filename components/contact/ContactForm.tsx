@@ -115,6 +115,7 @@ export default function ContactForm() {
             {t("form.email")} <span className="text-gold">*</span>
           </label>
           <input
+            dir="ltr"
             type="email"
             id="contact-email"
             name="email"
@@ -131,6 +132,7 @@ export default function ContactForm() {
             {t("form.phone")}
           </label>
           <input
+            dir="ltr"
             type="tel"
             id="contact-phone"
             name="phone"

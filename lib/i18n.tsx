@@ -44,8 +44,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "contact.heading": "Get in Touch",
 
     // Footer
-    "footer.tagline": "Art Curation & Management",
-    "footer.copyright": "© 2026 NEKAVE Artist Management",
+    "footer.tagline": "Artists Management & Curation",
+    "footer.copyright": "© 2026 NEKAVE Artists Management",
 
     // Form
     "form.name": "Name",
@@ -82,9 +82,9 @@ const translations: Record<Locale, Record<string, string>> = {
     "scroll.1.title": "אמנות שנבחרה\nבקפידה",
     "scroll.1.subtitle":
       "כל עבודה באוסף NEKAVE נבחרת בקפידה. נאספת בזכות המלאכה, הסיפור והערך המתמשך שלה.",
-    "scroll.2.title": "ממתחילים\nועד מבוססים",
+    "scroll.2.title": "מגוון שלם\nשל אמנות",
     "scroll.2.subtitle":
-      "אוצרות במגוון סגנונות וטווחי מחירים, מחברת אספנים עם יצירות שמדברות אליהם.",
+      "מיצירות ראשונות ועד עבודות של אמנים בינלאומיים, אנחנו מאתרים את מה שמדבר אליכם.",
     "scroll.3.title": "האמנות שלך,\nהחזון שלך",
     "scroll.3.subtitle":
       "בין אם אתם מתחילים אוסף או מרחיבים אותו, רון עובד אישית עם כל לקוח כדי למצוא את היצירה הנכונה.",

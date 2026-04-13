@@ -29,7 +29,7 @@ export default function ContactPage() {
               <div>
                 <h2 className="font-display text-lg mb-4">Visit Us</h2>
                 <address className="font-body text-sm text-charcoal/70 leading-relaxed not-italic">
-                  NEKAVE Artist Management
+                  NEKAVE Artists Management
                   <br />
                   14 Rothschild Boulevard
                   <br />
@@ -39,6 +39,7 @@ export default function ContactPage() {
                 <h2 className="font-display text-lg mb-4 mt-8">Contact</h2>
                 <div className="space-y-1">
                   <a
+                    dir="ltr"
                     href="mailto:nekaveart@gmail.com"
                     className="font-mono text-xs text-silver hover:text-gold transition-colors duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] block"
                   >

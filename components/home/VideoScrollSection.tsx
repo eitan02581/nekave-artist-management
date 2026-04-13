@@ -9,9 +9,13 @@ const SECTION_KEYS = [
   { titleKey: "scroll.3.title", subtitleKey: "scroll.3.subtitle" },
 ];
 
-// Number of frames to extract from the video.
-// More = smoother scrub but more memory. 120 is a good balance.
 const FRAME_COUNT = 120;
+
+function shouldUseFallback() {
+  if (typeof window === "undefined") return true;
+  // Use direct video scrub on all devices — lighter and works everywhere
+  return true;
+}
 
 export default function VideoScrollSection() {
   const { t } = useI18n();
@@ -22,94 +26,96 @@ export default function VideoScrollSection() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const framesRef = useRef<ImageBitmap[]>([]);
   const lastFrameIndexRef = useRef(-1);
-  const progressRef = useRef(0);
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
+  const [useFallback, setUseFallback] = useState(false);
 
-  // ── Extract frames from video into ImageBitmap cache ──
+  // ── Decide strategy on mount ──
   useEffect(() => {
-    let cancelled = false;
+    if (shouldUseFallback()) {
+      // Mobile: use direct video scrub (no frame extraction)
+      setUseFallback(true);
+      setLoaded(true);
+    } else {
+      // Desktop: extract frames into canvas cache
+      let cancelled = false;
 
-    async function extractFrames() {
-      const video = document.createElement("video");
-      video.src = "/paint-scroll.mp4";
-      video.muted = true;
-      video.playsInline = true;
-      video.preload = "auto";
-      video.crossOrigin = "anonymous";
+      async function extractFrames() {
+        const video = document.createElement("video");
+        video.src = "/paint-scroll.mp4";
+        video.muted = true;
+        video.playsInline = true;
+        video.preload = "auto";
+        video.crossOrigin = "anonymous";
 
-      // Wait for metadata
-      await new Promise<void>((resolve, reject) => {
-        video.onloadedmetadata = () => resolve();
-        video.onerror = () => reject(new Error("Video failed to load"));
-      });
-
-      const duration = video.duration;
-      const frames: ImageBitmap[] = [];
-
-      // Create offscreen canvas for frame capture
-      const offscreen = document.createElement("canvas");
-      offscreen.width = video.videoWidth;
-      offscreen.height = video.videoHeight;
-      const ctx = offscreen.getContext("2d");
-      if (!ctx) return;
-
-      for (let i = 0; i < FRAME_COUNT; i++) {
-        if (cancelled) return;
-
-        const time = (i / (FRAME_COUNT - 1)) * duration;
-        video.currentTime = time;
-
-        // Wait for the video to seek to the requested time
-        await new Promise<void>((resolve) => {
-          video.onseeked = () => resolve();
+        await new Promise<void>((resolve, reject) => {
+          video.onloadedmetadata = () => resolve();
+          video.onerror = () => reject(new Error("Video failed to load"));
         });
 
-        // Draw current frame to offscreen canvas
-        ctx.drawImage(video, 0, 0);
+        const duration = video.duration;
+        const frames: ImageBitmap[] = [];
 
-        // Create an ImageBitmap for instant future drawing
-        const bitmap = await createImageBitmap(offscreen);
-        frames.push(bitmap);
+        const offscreen = document.createElement("canvas");
+        offscreen.width = video.videoWidth;
+        offscreen.height = video.videoHeight;
+        const ctx = offscreen.getContext("2d");
+        if (!ctx) return;
+
+        for (let i = 0; i < FRAME_COUNT; i++) {
+          if (cancelled) return;
+
+          video.currentTime = (i / (FRAME_COUNT - 1)) * duration;
+
+          await new Promise<void>((resolve) => {
+            video.onseeked = () => resolve();
+          });
+
+          ctx.drawImage(video, 0, 0);
+          const bitmap = await createImageBitmap(offscreen);
+          frames.push(bitmap);
+
+          if (!cancelled) {
+            setLoadProgress(Math.round(((i + 1) / FRAME_COUNT) * 100));
+          }
+        }
 
         if (!cancelled) {
-          setLoadProgress(Math.round(((i + 1) / FRAME_COUNT) * 100));
+          framesRef.current = frames;
+          setLoaded(true);
+          drawFrame(0);
         }
       }
 
-      if (!cancelled) {
-        framesRef.current = frames;
+      extractFrames().catch(() => {
+        // If frame extraction fails (memory), fall back to video scrub
+        setUseFallback(true);
         setLoaded(true);
+      });
 
-        // Draw the first frame immediately
-        drawFrame(0);
-      }
+      return () => {
+        cancelled = true;
+      };
     }
-
-    extractFrames().catch(console.error);
-
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
-  // ── Draw a specific frame index to the canvas ──
+  // ── Draw a specific frame to canvas (desktop only) ──
   const drawFrame = useCallback((index: number) => {
     const canvas = canvasRef.current;
     const frames = framesRef.current;
     if (!canvas || !frames.length) return;
 
     const clamped = Math.max(0, Math.min(frames.length - 1, index));
-    if (clamped === lastFrameIndexRef.current) return; // Skip redundant draws
+    if (clamped === lastFrameIndexRef.current) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const frame = frames[clamped];
-    // Match canvas internal resolution to the video frame
     if (canvas.width !== frame.width || canvas.height !== frame.height) {
       canvas.width = frame.width;
       canvas.height = frame.height;
@@ -124,7 +130,7 @@ export default function VideoScrollSection() {
     let rafId = 0;
 
     function onScroll() {
-      if (rafId) return; // Coalesce to one rAF per frame
+      if (rafId) return;
       rafId = requestAnimationFrame(() => {
         rafId = 0;
         const container = containerRef.current;
@@ -135,12 +141,19 @@ export default function VideoScrollSection() {
         const raw = -rect.top / scrollableHeight;
         const clamped = Math.max(0, Math.min(1, raw));
 
-        progressRef.current = clamped;
         setProgress(clamped);
 
-        // Map progress to frame index and draw
-        const frameIndex = Math.round(clamped * (FRAME_COUNT - 1));
-        drawFrame(frameIndex);
+        if (useFallback) {
+          // Mobile: scrub video directly
+          const video = videoRef.current;
+          if (video && video.duration && isFinite(video.duration)) {
+            video.currentTime = clamped * video.duration;
+          }
+        } else {
+          // Desktop: draw cached frame
+          const frameIndex = Math.round(clamped * (FRAME_COUNT - 1));
+          drawFrame(frameIndex);
+        }
       });
     }
 
@@ -151,9 +164,9 @@ export default function VideoScrollSection() {
       window.removeEventListener("scroll", onScroll);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [drawFrame]);
+  }, [drawFrame, useFallback]);
 
-  // ── Text opacity and parallax calculations ──
+  // ── Text calculations ──
   const getTextOpacity = (index: number) => {
     const sectionSize = 1 / sections.length;
     const sectionStart = index * sectionSize;
@@ -180,20 +193,34 @@ export default function VideoScrollSection() {
       ref={containerRef}
       className="relative h-[250vh]"
     >
-      {/* Sticky viewport-filling wrapper */}
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
-        {/* Canvas for frame-by-frame video display */}
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{
-            imageRendering: "auto",
-            opacity: loaded ? 1 : 0,
-            transition: "opacity 0.6s ease",
-          }}
-        />
+        {/* Desktop: canvas for cached frames */}
+        {!useFallback && (
+          <canvas
+            ref={canvasRef}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              imageRendering: "auto",
+              opacity: loaded ? 1 : 0,
+              transition: "opacity 0.6s ease",
+            }}
+          />
+        )}
 
-        {/* Loading state */}
+        {/* Mobile: direct video element */}
+        {useFallback && (
+          <video
+            ref={videoRef}
+            src="/paint-scroll.mp4"
+            muted
+            playsInline
+            preload="auto"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ pointerEvents: "none" }}
+          />
+        )}
+
+        {/* Loading state (desktop only) */}
         {!loaded && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
             <div className="w-48 h-[1px] bg-white/10 rounded-full overflow-hidden">
@@ -211,7 +238,7 @@ export default function VideoScrollSection() {
           </div>
         )}
 
-        {/* Dark overlay for text readability */}
+        {/* Dark overlay */}
         <div
           className="absolute inset-0"
           style={{
@@ -241,13 +268,11 @@ export default function VideoScrollSection() {
                       willChange: "transform, opacity",
                     }}
                   >
-                    {/* Eyebrow counter */}
                     <span className="inline-block rounded-full border border-white/40 px-4 py-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.25em] text-white/90 mb-8">
                       {String(index + 1).padStart(2, "0")} /{" "}
                       {String(sections.length).padStart(2, "0")}
                     </span>
 
-                    {/* Title */}
                     <h2
                       className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-light text-white tracking-wide leading-[1.1] whitespace-pre-line mb-6 md:mb-8"
                       style={{
@@ -257,7 +282,6 @@ export default function VideoScrollSection() {
                       {section.title}
                     </h2>
 
-                    {/* Subtitle */}
                     <p className="font-body text-sm md:text-base font-bold text-white/85 max-w-xl leading-relaxed">
                       {section.subtitle}
                     </p>
@@ -268,7 +292,7 @@ export default function VideoScrollSection() {
           </div>
         )}
 
-        {/* Scroll progress bar */}
+        {/* Progress bar */}
         <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/10">
           <div
             className="h-full bg-gold"
