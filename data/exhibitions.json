@@ -1,0 +1,38 @@
+[
+  {
+    "slug": "between-surfaces",
+    "title": "Between Surfaces",
+    "startDate": "2026-03-15",
+    "endDate": "2026-05-30",
+    "venue": "Galerie Neuer Meister",
+    "location": "Berlin, Germany",
+    "description": "Between Surfaces brings together three artists whose practices interrogate materiality and its relationship to perception. From Elena Vasquez's layered oil paintings to Yuki Tanaka's tactile ceramic forms and James Whitfield's architectural abstractions, the exhibition traces a shared concern with how surfaces -- painted, sculpted, built -- mediate our experience of space and emotion. Curated by Anna-Lena Richter.",
+    "image": "/images/exhibitions/between-surfaces.jpg",
+    "artistSlugs": ["elena-vasquez", "yuki-tanaka", "james-whitfield"],
+    "status": "current"
+  },
+  {
+    "slug": "weight-and-light",
+    "title": "Weight and Light",
+    "startDate": "2026-06-20",
+    "endDate": "2026-09-14",
+    "venue": "Hauser & Wirth Somerset",
+    "location": "Bruton, United Kingdom",
+    "description": "Weight and Light presents a dialogue between the monumental steel sculptures of Luca Moravec and the luminous interior paintings of Tobias Lindqvist. Despite their divergent media, both artists share a preoccupation with the way physical presence -- of mass, of light, of emptiness -- can generate profound emotional resonance. The exhibition includes new commissions created specifically for the gallery's converted farm buildings.",
+    "image": "/images/exhibitions/weight-and-light.jpg",
+    "artistSlugs": ["luca-moravec", "tobias-lindqvist"],
+    "status": "upcoming"
+  },
+  {
+    "slug": "new-cartographies",
+    "title": "New Cartographies",
+    "startDate": "2025-09-05",
+    "endDate": "2025-12-20",
+    "venue": "The Broad",
+    "location": "Los Angeles, United States",
+    "description": "New Cartographies examined how contemporary artists map identity, place, and belonging through paint. Featuring the work of Amara Osei and Elena Vasquez alongside four other international painters, the exhibition explored the ways in which painting continues to serve as a vital tool for navigating the complexities of cultural geography. The show was accompanied by a catalogue with essays by Okwui Enwezor and Adrienne Edwards.",
+    "image": "/images/exhibitions/new-cartographies.jpg",
+    "artistSlugs": ["amara-osei", "elena-vasquez"],
+    "status": "past"
+  }
+]

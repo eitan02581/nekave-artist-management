@@ -1,0 +1,215 @@
+[
+  {
+    "slug": "elena-vasquez",
+    "name": "Elena Vasquez",
+    "medium": "Painter",
+    "location": "Mexico City, Mexico",
+    "bio": "Elena Vasquez's practice interrogates the boundaries between landscape and memory, drawing on the chromatic intensity of her native Mexico City to construct layered compositions that oscillate between figuration and abstraction. Working primarily in oil and mixed media, Vasquez builds surfaces through successive glazes and impasto passages, creating works that reward sustained looking with unexpected depths of colour and texture. Her paintings have been described as \"emotional topographies\" -- maps of interior states rendered in the language of place. Vasquez holds an MFA from the Royal Academy Schools, London, and has exhibited widely across Latin America, Europe, and the United States.",
+    "portrait": "/images/artists/elena-vasquez/portrait.jpg",
+    "featured": true,
+    "works": [
+      {
+        "title": "Tierra Sumergida",
+        "year": 2024,
+        "medium": "Oil on canvas",
+        "dimensions": "180 x 140 cm",
+        "image": "/images/artists/elena-vasquez/work-1.jpg"
+      },
+      {
+        "title": "The Hours Between",
+        "year": 2023,
+        "medium": "Oil and pigment on linen",
+        "dimensions": "150 x 120 cm",
+        "image": "/images/artists/elena-vasquez/work-2.jpg"
+      },
+      {
+        "title": "Cartography of Forgetting",
+        "year": 2023,
+        "medium": "Mixed media on canvas",
+        "dimensions": "200 x 160 cm",
+        "image": "/images/artists/elena-vasquez/work-3.jpg"
+      },
+      {
+        "title": "Dust and Meridian",
+        "year": 2022,
+        "medium": "Oil on canvas",
+        "dimensions": "120 x 90 cm",
+        "image": "/images/artists/elena-vasquez/work-4.jpg"
+      }
+    ]
+  },
+  {
+    "slug": "tobias-lindqvist",
+    "name": "Tobias Lindqvist",
+    "medium": "Painter",
+    "location": "Stockholm, Sweden",
+    "bio": "Tobias Lindqvist's paintings explore the quiet drama of Nordic light and its capacity to transform the mundane into the luminous. His canvases depict spare, often uninhabited interiors and coastal scenes rendered with a meticulous attention to tonal shifts that recalls the tradition of Vilhelm Hammershoi while remaining decisively contemporary. Lindqvist is interested in the tension between presence and absence -- the way an empty room can hold the residue of human activity. His restrained palette and deliberate compositions invite contemplation, offering a counterpoint to the velocity of contemporary image culture. He has been the subject of solo exhibitions at Moderna Museet, Stockholm, and the Kunsthalle Basel.",
+    "portrait": "/images/artists/tobias-lindqvist/portrait.jpg",
+    "featured": true,
+    "works": [
+      {
+        "title": "Interior with Grey Light",
+        "year": 2025,
+        "medium": "Oil on panel",
+        "dimensions": "90 x 70 cm",
+        "image": "/images/artists/tobias-lindqvist/work-1.jpg"
+      },
+      {
+        "title": "Archipelago, November",
+        "year": 2024,
+        "medium": "Oil on linen",
+        "dimensions": "130 x 100 cm",
+        "image": "/images/artists/tobias-lindqvist/work-2.jpg"
+      },
+      {
+        "title": "The Seventh Room",
+        "year": 2024,
+        "medium": "Oil on canvas",
+        "dimensions": "110 x 85 cm",
+        "image": "/images/artists/tobias-lindqvist/work-3.jpg"
+      }
+    ]
+  },
+  {
+    "slug": "amara-osei",
+    "name": "Amara Osei",
+    "medium": "Painter",
+    "location": "Accra, Ghana",
+    "bio": "Amara Osei's vibrant, large-scale paintings centre the Black figure within richly patterned domestic and ceremonial spaces, weaving together references to West African textile traditions, diasporic visual culture, and the history of European portraiture. Her work is both a celebration and a reclamation -- positioning her subjects within an iconography of dignity, joy, and interiority that challenges the reductive narratives historically imposed on African bodies. Osei's technique combines flat fields of saturated colour with areas of intricate, almost textile-like detail, producing compositions that are at once monumental and intimate. She was awarded the Henrike Naumann Prize in 2023 and has been included in group exhibitions at the Palais de Tokyo and the Studio Museum in Harlem.",
+    "portrait": "/images/artists/amara-osei/portrait.jpg",
+    "featured": true,
+    "works": [
+      {
+        "title": "Gathering at Dusk",
+        "year": 2025,
+        "medium": "Acrylic and gold leaf on canvas",
+        "dimensions": "220 x 180 cm",
+        "image": "/images/artists/amara-osei/work-1.jpg"
+      },
+      {
+        "title": "She Carries the River",
+        "year": 2024,
+        "medium": "Acrylic on canvas",
+        "dimensions": "190 x 150 cm",
+        "image": "/images/artists/amara-osei/work-2.jpg"
+      },
+      {
+        "title": "Indigo Hours",
+        "year": 2024,
+        "medium": "Oil and fabric collage on canvas",
+        "dimensions": "200 x 160 cm",
+        "image": "/images/artists/amara-osei/work-3.jpg"
+      },
+      {
+        "title": "Portrait with Kente",
+        "year": 2023,
+        "medium": "Acrylic on linen",
+        "dimensions": "150 x 120 cm",
+        "image": "/images/artists/amara-osei/work-4.jpg"
+      }
+    ]
+  },
+  {
+    "slug": "james-whitfield",
+    "name": "James Whitfield",
+    "medium": "Painter",
+    "location": "London, United Kingdom",
+    "bio": "James Whitfield works at the intersection of painting and architecture, producing geometric abstractions that investigate spatial perception, optical rhythm, and the phenomenology of colour. His process is methodical and research-driven, often beginning with studies of built environments -- facades, floor plans, structural grids -- which he distils into precise, hard-edged compositions. Despite their apparent rigour, Whitfield's paintings are animated by subtle irregularities and shifts in hue that introduce a human warmth to their systematic foundations. His work has been exhibited at the Whitechapel Gallery, the Irish Museum of Modern Art, and the Sharjah Art Foundation.",
+    "portrait": "/images/artists/james-whitfield/portrait.jpg",
+    "featured": false,
+    "works": [
+      {
+        "title": "Grid Study No. 17",
+        "year": 2025,
+        "medium": "Acrylic on aluminium panel",
+        "dimensions": "120 x 120 cm",
+        "image": "/images/artists/james-whitfield/work-1.jpg"
+      },
+      {
+        "title": "Elevation (Red Shift)",
+        "year": 2024,
+        "medium": "Acrylic on canvas",
+        "dimensions": "160 x 130 cm",
+        "image": "/images/artists/james-whitfield/work-2.jpg"
+      },
+      {
+        "title": "Threshold Conditions",
+        "year": 2023,
+        "medium": "Oil and acrylic on panel",
+        "dimensions": "100 x 80 cm",
+        "image": "/images/artists/james-whitfield/work-3.jpg"
+      }
+    ]
+  },
+  {
+    "slug": "yuki-tanaka",
+    "name": "Yuki Tanaka",
+    "medium": "Sculptor",
+    "location": "Tokyo, Japan",
+    "bio": "Yuki Tanaka's sculptural practice is rooted in a dialogue between traditional Japanese craft and contemporary minimalism. Working in ceramic, bronze, and occasionally hand-formed glass, Tanaka creates objects and installations that foreground the expressive potential of material surfaces -- the bloom of a wood-fired glaze, the patina of oxidised metal, the translucency of kiln-cast glass. Her forms are spare and organic, often evoking natural phenomena such as erosion, growth, and sedimentation, yet they resist literal representation, hovering instead in a space of poetic ambiguity. Tanaka's work has been shown at the Mori Art Museum, the 21st Century Museum of Contemporary Art in Kanazawa, and the Venice Architecture Biennale.",
+    "portrait": "/images/artists/yuki-tanaka/portrait.jpg",
+    "featured": true,
+    "works": [
+      {
+        "title": "Vessel for Silence",
+        "year": 2025,
+        "medium": "Wood-fired stoneware",
+        "dimensions": "45 x 30 x 30 cm",
+        "image": "/images/artists/yuki-tanaka/work-1.jpg"
+      },
+      {
+        "title": "Erosion Study III",
+        "year": 2024,
+        "medium": "Cast bronze with patina",
+        "dimensions": "60 x 40 x 35 cm",
+        "image": "/images/artists/yuki-tanaka/work-2.jpg"
+      },
+      {
+        "title": "Tidal Memory",
+        "year": 2024,
+        "medium": "Kiln-cast glass",
+        "dimensions": "25 x 50 x 20 cm",
+        "image": "/images/artists/yuki-tanaka/work-3.jpg"
+      },
+      {
+        "title": "Ground and Horizon",
+        "year": 2023,
+        "medium": "Ceramic and steel armature",
+        "dimensions": "110 x 45 x 45 cm",
+        "image": "/images/artists/yuki-tanaka/work-4.jpg"
+      }
+    ]
+  },
+  {
+    "slug": "luca-moravec",
+    "name": "Luca Moravec",
+    "medium": "Sculptor",
+    "location": "Prague, Czech Republic",
+    "bio": "Luca Moravec's large-scale sculptures and site-specific installations explore the relationship between the human body and industrial infrastructure. Fabricated in welded steel, cast concrete, and reclaimed architectural elements, his works occupy a territory between brutalist monument and organic form, channelling the weight and history of post-industrial landscapes into objects of austere beauty. Moravec is particularly interested in the concept of \"structural empathy\" -- the idea that engineered forms can elicit bodily and emotional responses through scale, balance, and material presence. He has completed major public commissions in Prague, Berlin, and Rotterdam, and his work is held in the collections of the Centre Pompidou and the National Gallery Prague.",
+    "portrait": "/images/artists/luca-moravec/portrait.jpg",
+    "featured": false,
+    "works": [
+      {
+        "title": "Column for an Absent Building",
+        "year": 2025,
+        "medium": "Welded steel",
+        "dimensions": "320 x 80 x 80 cm",
+        "image": "/images/artists/luca-moravec/work-1.jpg"
+      },
+      {
+        "title": "Load-Bearing (After Brancusi)",
+        "year": 2024,
+        "medium": "Cast concrete and steel",
+        "dimensions": "240 x 60 x 60 cm",
+        "image": "/images/artists/luca-moravec/work-2.jpg"
+      },
+      {
+        "title": "Counterweight",
+        "year": 2023,
+        "medium": "Reclaimed steel and stone",
+        "dimensions": "180 x 120 x 90 cm",
+        "image": "/images/artists/luca-moravec/work-3.jpg"
+      }
+    ]
+  }
+]
