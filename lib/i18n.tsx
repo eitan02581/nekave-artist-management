@@ -100,8 +100,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "contact.heading": "בואו נדבר",
 
     // Footer
-    "footer.tagline": "אוצרות וניהול אמנות",
-    "footer.copyright": "© 2026 NEKAVE ניהול אמנים",
+    "footer.tagline": "Artist Management",
+    "footer.copyright": "© 2026 NEKAVE Artists Management",
 
     // Form
     "form.name": "שם",

@@ -47,7 +47,10 @@ export default function HomePage() {
             >
               NEKAVE
             </h1>
-            <p dir="ltr" className="font-body text-white/70 uppercase text-[10px] md:text-xs font-bold flex justify-between mt-2 pl-[0.25em]">
+            <p
+              dir="ltr"
+              className="font-body text-white/70 uppercase text-[10px] md:text-xs font-bold flex justify-between mt-2 pl-[0.25em]"
+            >
               {"ARTISTS MANAGEMENT".split("").map((char, i) => (
                 <span key={i}>{char === " " ? "\u00A0" : char}</span>
               ))}
@@ -60,7 +63,7 @@ export default function HomePage() {
       <VideoScrollSection />
 
       {/* ─── About ─── */}
-      <section className="py-24 md:py-32">
+      <section className="pt-24 md:pt-32">
         <div className="max-w-3xl mx-auto px-8 md:px-16 text-center">
           <ScrollReveal variant="fade-up">
             <span className="inline-block rounded-full bg-charcoal/5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-charcoal mb-6">
@@ -78,14 +81,17 @@ export default function HomePage() {
 
       {/* ─── Logo Divider ─── */}
       <section className="py-20 md:py-28">
-        <div className="flex justify-center">
-          <ScrollReveal variant="fade-up">
+        <div className="flex items-center justify-center">
+          <ScrollReveal
+            variant="fade-up"
+            className="flex items-center justify-center w-full"
+          >
             <Image
               src="/logo.png"
               alt="Nekave logo"
               width={320}
               height={320}
-              className="w-52 h-52 md:w-72 md:h-72 lg:w-80 lg:h-80"
+              className="w-52 h-52 md:w-72 md:h-72 lg:w-80 lg:h-80 mx-auto block"
             />
           </ScrollReveal>
         </div>
@@ -150,7 +156,13 @@ export default function HomePage() {
               >
                 <rect x="2" y="2" width="20" height="20" rx="5" />
                 <circle cx="12" cy="12" r="5" />
-                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                <circle
+                  cx="17.5"
+                  cy="6.5"
+                  r="1"
+                  fill="currentColor"
+                  stroke="none"
+                />
               </svg>
               @nekaveart
             </a>

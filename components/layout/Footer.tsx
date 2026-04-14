@@ -45,8 +45,10 @@ export default function Footer() {
 
         {/* Copyright + language toggle */}
         <div className="mt-12 flex flex-col items-center gap-4">
-          <p className="text-center text-silver text-xs font-body">
-            {t("footer.copyright")}
+          <p className="text-center text-silver text-xs font-body leading-relaxed">
+            © 2026
+            <br />
+            NEKAVE Artists Management
           </p>
           <button
             onClick={toggleLocale}
