@@ -27,6 +27,7 @@ export default function HomePage() {
         >
           <BackgroundVideo
             src="/todoai-video-1776109340881.mp4"
+            mobileSrc="/todoai-hero-mobile.mp4"
             playbackRate={1}
           />
         </div>

@@ -9,7 +9,8 @@ const SECTION_KEYS = [
   { titleKey: "scroll.3.title", subtitleKey: "scroll.3.subtitle" },
 ];
 
-const FRAME_COUNT = 120;
+const DESKTOP_FRAME_COUNT = 120;
+const MOBILE_FRAME_COUNT = 60;
 
 export default function VideoScrollSection() {
   const { t } = useI18n();
@@ -20,105 +21,84 @@ export default function VideoScrollSection() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const framesRef = useRef<ImageBitmap[]>([]);
   const lastFrameIndexRef = useRef(-1);
+  const frameCountRef = useRef(DESKTOP_FRAME_COUNT);
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
-  const [mobile, setMobile] = useState(false);
+  const [fallback, setFallback] = useState(false);
 
-  // ── Detect device and set up video strategy ──
+  // ── Extract frames from video into ImageBitmap cache ──
   useEffect(() => {
-    const isMobileDevice =
+    const isMobile =
       window.innerWidth < 768 ||
       /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-    setMobile(isMobileDevice);
+    const frameCount = isMobile ? MOBILE_FRAME_COUNT : DESKTOP_FRAME_COUNT;
+    const videoSrc = isMobile ? "/paint-scroll-mobile.mp4" : "/paint-scroll.mp4";
+    frameCountRef.current = frameCount;
 
-    if (isMobileDevice) {
-      // Mobile: use direct video element with iOS play/pause buffer trick
-      const video = videoRef.current;
-      if (video) {
-        // Force iOS Safari to buffer the video by briefly playing it
-        const tryBuffer = () => {
-          video.play().then(() => {
-            video.pause();
-            video.currentTime = 0;
-            setLoaded(true);
-          }).catch(() => {
-            // Even if play fails, mark as loaded — seeking may still work
-            setLoaded(true);
-          });
-        };
+    let cancelled = false;
 
-        if (video.readyState >= 2) {
-          tryBuffer();
-        } else {
-          video.addEventListener("loadeddata", tryBuffer, { once: true });
-        }
-      }
-    } else {
-      // Desktop: extract frames into ImageBitmap cache for smooth canvas scrub
-      let cancelled = false;
+    async function extractFrames() {
+      const video = document.createElement("video");
+      video.src = videoSrc;
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = "auto";
+      video.crossOrigin = "anonymous";
 
-      async function extractFrames() {
-        const video = document.createElement("video");
-        video.src = "/paint-scroll.mp4";
-        video.muted = true;
-        video.playsInline = true;
-        video.preload = "auto";
-        video.crossOrigin = "anonymous";
-
-        await new Promise<void>((resolve, reject) => {
-          video.onloadedmetadata = () => resolve();
-          video.onerror = () => reject(new Error("Video failed to load"));
-        });
-
-        const duration = video.duration;
-        const frames: ImageBitmap[] = [];
-
-        const offscreen = document.createElement("canvas");
-        offscreen.width = video.videoWidth;
-        offscreen.height = video.videoHeight;
-        const ctx = offscreen.getContext("2d");
-        if (!ctx) return;
-
-        for (let i = 0; i < FRAME_COUNT; i++) {
-          if (cancelled) return;
-
-          video.currentTime = (i / (FRAME_COUNT - 1)) * duration;
-          await new Promise<void>((resolve) => {
-            video.onseeked = () => resolve();
-          });
-
-          ctx.drawImage(video, 0, 0);
-          const bitmap = await createImageBitmap(offscreen);
-          frames.push(bitmap);
-
-          if (!cancelled) {
-            setLoadProgress(Math.round(((i + 1) / FRAME_COUNT) * 100));
-          }
-        }
-
-        if (!cancelled) {
-          framesRef.current = frames;
-          setLoaded(true);
-          drawFrame(0);
-        }
-      }
-
-      extractFrames().catch(() => {
-        // If extraction fails (memory), fall back to video scrub
-        setMobile(true);
-        setLoaded(true);
+      await new Promise<void>((resolve, reject) => {
+        video.onloadedmetadata = () => resolve();
+        video.onerror = () => reject(new Error("Video failed to load"));
       });
 
-      return () => { cancelled = true; };
+      const duration = video.duration;
+      const frames: ImageBitmap[] = [];
+
+      const offscreen = document.createElement("canvas");
+      offscreen.width = video.videoWidth;
+      offscreen.height = video.videoHeight;
+      const ctx = offscreen.getContext("2d");
+      if (!ctx) return;
+
+      for (let i = 0; i < frameCount; i++) {
+        if (cancelled) return;
+
+        video.currentTime = (i / (frameCount - 1)) * duration;
+        await new Promise<void>((resolve) => {
+          video.onseeked = () => resolve();
+        });
+
+        ctx.drawImage(video, 0, 0);
+        const bitmap = await createImageBitmap(offscreen);
+        frames.push(bitmap);
+
+        if (!cancelled) {
+          setLoadProgress(Math.round(((i + 1) / frameCount) * 100));
+        }
+      }
+
+      if (!cancelled) {
+        framesRef.current = frames;
+        setLoaded(true);
+        drawFrame(0);
+      }
     }
+
+    extractFrames().catch(() => {
+      // If extraction fails (e.g. OOM on very old device), show poster fallback
+      setFallback(true);
+      setLoaded(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // ── Draw a cached frame to canvas (desktop) ──
+  // ── Draw a cached frame to canvas ──
   const drawFrame = useCallback((index: number) => {
     const canvas = canvasRef.current;
     const frames = framesRef.current;
@@ -158,15 +138,8 @@ export default function VideoScrollSection() {
 
         setProgress(clamped);
 
-        if (mobile) {
-          const video = videoRef.current;
-          if (video && video.duration && isFinite(video.duration)) {
-            video.currentTime = clamped * video.duration;
-          }
-        } else {
-          const frameIndex = Math.round(clamped * (FRAME_COUNT - 1));
-          drawFrame(frameIndex);
-        }
+        const frameIndex = Math.round(clamped * (frameCountRef.current - 1));
+        drawFrame(frameIndex);
       });
     }
 
@@ -177,7 +150,7 @@ export default function VideoScrollSection() {
       window.removeEventListener("scroll", onScroll);
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [drawFrame, mobile]);
+  }, [drawFrame]);
 
   // ── Text calculations ──
   const getTextOpacity = (index: number) => {
@@ -204,32 +177,27 @@ export default function VideoScrollSection() {
   return (
     <section ref={containerRef} className="relative h-[250vh]">
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
-        {/* Desktop: canvas for cached frames (smooth 120-frame scrub) */}
+        {/* Canvas for cached frames (both desktop and mobile) */}
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full object-cover"
           style={{
             imageRendering: "auto",
-            opacity: !mobile && loaded ? 1 : 0,
+            opacity: loaded && !fallback ? 1 : 0,
             transition: "opacity 0.6s ease",
           }}
         />
 
-        {/* Mobile: video element with iOS buffer trick */}
-        <video
-          ref={videoRef}
-          src="/paint-scroll.mp4"
-          muted
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{
-            pointerEvents: "none",
-            opacity: mobile ? 1 : 0,
-          }}
-        />
+        {/* Poster fallback for very old devices where frame extraction fails */}
+        {fallback && (
+          <img
+            src="/paint-scroll-poster.jpg"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
 
-        {/* Loading state (desktop frame extraction) */}
+        {/* Loading state (frame extraction) */}
         {!loaded && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
             <div className="w-48 h-[1px] bg-white/10 rounded-full overflow-hidden">
