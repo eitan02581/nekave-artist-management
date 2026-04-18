@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
-# Extracts 60 WebP frames at 1080x608 from public/paint-scroll.mp4 into public/frames/.
-# Consumed by components/home/VideoScrollSection.tsx (mobile branch).
-# Re-run this whenever paint-scroll.mp4 changes.
+# Generates the mobile-optimised assets used by the homepage:
 #
-# Two-stage pipeline because Homebrew's stock ffmpeg ships without libwebp:
-#   1. ffmpeg -> high-quality PNG frames in a temp dir
-#   2. sharp (Node)  -> WebP at quality 78 in public/frames/
+#   1. public/frames/frame-*.webp        — 60 WebP scroll frames at 1080x608
+#                                          (consumed by components/home/VideoScrollSection.tsx)
+#   2. public/todoai-hero-mobile.mp4     — 720p H.264 hero loop
+#                                          (consumed by components/home/BackgroundVideo.tsx)
+#
+# Re-run this whenever the source masters change:
+#   - public/paint-scroll.mp4
+#   - public/todoai-video-1776109340881.mp4
+#
+# Frames use a two-stage pipeline because Homebrew's stock ffmpeg ships without libwebp:
+#   ffmpeg -> high-quality PNGs in a temp dir, then sharp (Node) -> WebP quality 78.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -20,6 +26,7 @@ if [ ! -d node_modules/sharp ]; then
   exit 1
 fi
 
+# ── 1. WebP scroll frames ────────────────────────────────────────────────────
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
@@ -33,4 +40,17 @@ ffmpeg -y -loglevel error -i public/paint-scroll.mp4 \
 
 node scripts/encode-webp-frames.mjs "$TMPDIR" public/frames
 
-echo "Generated $(ls public/frames/frame-*.webp | wc -l | tr -d ' ') frames, total $(du -sh public/frames | cut -f1)"
+echo "Frames: $(ls public/frames/frame-*.webp | wc -l | tr -d ' ') generated, total $(du -sh public/frames | cut -f1)"
+
+# ── 2. Mobile hero video ─────────────────────────────────────────────────────
+# 1280x720 H.264 main profile, CRF 23, audio stripped (component plays muted).
+# +faststart moves the moov atom to the front so playback can begin while
+# the file is still streaming — important for autoplay-on-scroll feel.
+ffmpeg -y -loglevel error \
+  -i public/todoai-video-1776109340881.mp4 \
+  -vf "scale=1280:720:flags=lanczos" \
+  -c:v libx264 -profile:v main -level 4.0 -preset slow -crf 23 \
+  -pix_fmt yuv420p -movflags +faststart -an \
+  public/todoai-hero-mobile.mp4
+
+echo "Hero:   $(du -sh public/todoai-hero-mobile.mp4 | cut -f1) at 1280x720"
