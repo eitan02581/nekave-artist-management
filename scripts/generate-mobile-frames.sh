@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Generates the mobile-optimised assets used by the homepage:
 #
-#   1. public/frames/frame-*.webp        — 60 WebP scroll frames at 1080x608
+#   1. public/frames/frame-*.webp        — 61 WebP scroll frames at 1280x720
 #                                          (consumed by components/home/VideoScrollSection.tsx)
 #   2. public/todoai-hero-mobile.mp4     — 720p H.264 hero loop
 #                                          (consumed by components/home/BackgroundVideo.tsx)
@@ -34,7 +34,7 @@ rm -f public/frames/frame-*.jpg public/frames/frame-*.webp
 mkdir -p public/frames
 
 ffmpeg -y -loglevel error -i public/paint-scroll.mp4 \
-  -vf "select='not(mod(n\,2))',scale=1080:608:flags=lanczos" \
+  -vf "select='not(mod(n\,2))',scale=1280:720:flags=lanczos" \
   -fps_mode vfr \
   "$TMPDIR/frame-%04d.png"
 

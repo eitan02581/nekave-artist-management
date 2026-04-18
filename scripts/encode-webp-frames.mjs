@@ -16,7 +16,7 @@ await Promise.all(
   files.map(async (file) => {
     const out = join(outputDir, `${parse(file).name}.webp`);
     await sharp(join(inputDir, file))
-      .webp({ quality: 78, effort: 6 })
+      .webp({ quality: 85, effort: 6 })
       .toFile(out);
   }),
 );
