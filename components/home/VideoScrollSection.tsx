@@ -10,10 +10,11 @@ const SECTION_KEYS = [
 ];
 
 const DESKTOP_FRAME_COUNT = 120;
-const MOBILE_FRAME_COUNT = 40;
+const MOBILE_FRAME_COUNT = 61;
+const MOBILE_INITIAL_VISIBLE_FRAMES = 10;
 
 function getMobileFrameSrc(index: number) {
-  return `/frames/frame-${String(index + 1).padStart(4, "0")}.jpg`;
+  return `/frames/frame-${String(index + 1).padStart(4, "0")}.webp`;
 }
 
 export default function VideoScrollSection() {
@@ -43,36 +44,34 @@ export default function VideoScrollSection() {
     isMobileRef.current = isMobile;
 
     if (isMobile) {
-      // ─── Mobile: load pre-extracted JPEG image sequence ───
+      // ─── Mobile: load pre-extracted WebP image sequence ───
       // This avoids ALL iOS video API restrictions.
+      // Progressive: reveal canvas after the first batch decodes,
+      // keep streaming the rest in the background.
       frameCountRef.current = MOBILE_FRAME_COUNT;
 
-      const images: HTMLImageElement[] = [];
+      const images: HTMLImageElement[] = new Array(MOBILE_FRAME_COUNT);
+      mobileImagesRef.current = images;
       let loadedCount = 0;
+      let revealed = false;
+
+      const onAdvance = () => {
+        loadedCount++;
+        setLoadProgress(Math.round((loadedCount / MOBILE_FRAME_COUNT) * 100));
+
+        if (!revealed && loadedCount >= MOBILE_INITIAL_VISIBLE_FRAMES) {
+          revealed = true;
+          setLoaded(true);
+          drawFrame(0);
+        }
+      };
 
       for (let i = 0; i < MOBILE_FRAME_COUNT; i++) {
         const img = new Image();
+        img.onload = onAdvance;
+        img.onerror = onAdvance;
         img.src = getMobileFrameSrc(i);
-        img.onload = () => {
-          loadedCount++;
-          setLoadProgress(Math.round((loadedCount / MOBILE_FRAME_COUNT) * 100));
-
-          if (loadedCount === MOBILE_FRAME_COUNT) {
-            mobileImagesRef.current = images;
-            setLoaded(true);
-            drawFrame(0);
-          }
-        };
-        img.onerror = () => {
-          // Count errors as loaded to avoid hanging
-          loadedCount++;
-          if (loadedCount === MOBILE_FRAME_COUNT) {
-            mobileImagesRef.current = images;
-            setLoaded(true);
-            drawFrame(0);
-          }
-        };
-        images.push(img);
+        images[i] = img;
       }
     } else {
       // ─── Desktop: extract frames from video into ImageBitmap cache ───
@@ -142,19 +141,37 @@ export default function VideoScrollSection() {
     if (!canvas) return;
 
     if (isMobileRef.current) {
-      // Mobile: draw from preloaded Image elements
+      // Mobile: draw from preloaded Image elements.
+      // While frames stream in, fall back to the nearest decoded frame
+      // so the canvas never appears frozen during fast scroll.
       const images = mobileImagesRef.current;
       if (!images.length) return;
 
-      const clamped = Math.max(0, Math.min(images.length - 1, index));
-      if (clamped === lastFrameIndexRef.current) return;
+      const target = Math.max(0, Math.min(images.length - 1, index));
+      let chosen = -1;
+      for (let i = target; i >= 0; i--) {
+        const candidate = images[i];
+        if (candidate && candidate.complete && candidate.naturalWidth) {
+          chosen = i;
+          break;
+        }
+      }
+      if (chosen === -1) {
+        for (let i = target + 1; i < images.length; i++) {
+          const candidate = images[i];
+          if (candidate && candidate.complete && candidate.naturalWidth) {
+            chosen = i;
+            break;
+          }
+        }
+      }
+      if (chosen === -1) return;
+      if (chosen === lastFrameIndexRef.current) return;
 
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const img = images[clamped];
-      if (!img.complete || !img.naturalWidth) return;
-
+      const img = images[chosen];
       if (
         canvas.width !== img.naturalWidth ||
         canvas.height !== img.naturalHeight
@@ -164,7 +181,7 @@ export default function VideoScrollSection() {
       }
 
       ctx.drawImage(img, 0, 0);
-      lastFrameIndexRef.current = clamped;
+      lastFrameIndexRef.current = chosen;
     } else {
       // Desktop: draw from cached ImageBitmaps
       const frames = framesRef.current;
