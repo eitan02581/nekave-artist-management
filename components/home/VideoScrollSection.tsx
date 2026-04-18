@@ -10,7 +10,11 @@ const SECTION_KEYS = [
 ];
 
 const DESKTOP_FRAME_COUNT = 120;
-const MOBILE_FRAME_COUNT = 60;
+const MOBILE_FRAME_COUNT = 40;
+
+function getMobileFrameSrc(index: number) {
+  return `/frames/frame-${String(index + 1).padStart(4, "0")}.jpg`;
+}
 
 export default function VideoScrollSection() {
   const { t } = useI18n();
@@ -22,102 +26,165 @@ export default function VideoScrollSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const framesRef = useRef<ImageBitmap[]>([]);
+  const mobileImagesRef = useRef<HTMLImageElement[]>([]);
   const lastFrameIndexRef = useRef(-1);
   const frameCountRef = useRef(DESKTOP_FRAME_COUNT);
+  const isMobileRef = useRef(false);
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
-  const [fallback, setFallback] = useState(false);
 
-  // ── Extract frames from video into ImageBitmap cache ──
+  // ── Load frames based on device ──
   useEffect(() => {
     const isMobile =
       window.innerWidth < 768 ||
       /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-    const frameCount = isMobile ? MOBILE_FRAME_COUNT : DESKTOP_FRAME_COUNT;
-    const videoSrc = isMobile ? "/paint-scroll-mobile.mp4" : "/paint-scroll.mp4";
-    frameCountRef.current = frameCount;
+    isMobileRef.current = isMobile;
 
-    let cancelled = false;
+    if (isMobile) {
+      // ─── Mobile: load pre-extracted JPEG image sequence ───
+      // This avoids ALL iOS video API restrictions.
+      frameCountRef.current = MOBILE_FRAME_COUNT;
 
-    async function extractFrames() {
-      const video = document.createElement("video");
-      video.src = videoSrc;
-      video.muted = true;
-      video.playsInline = true;
-      video.preload = "auto";
-      video.crossOrigin = "anonymous";
+      const images: HTMLImageElement[] = [];
+      let loadedCount = 0;
 
-      await new Promise<void>((resolve, reject) => {
-        video.onloadedmetadata = () => resolve();
-        video.onerror = () => reject(new Error("Video failed to load"));
-      });
+      for (let i = 0; i < MOBILE_FRAME_COUNT; i++) {
+        const img = new Image();
+        img.src = getMobileFrameSrc(i);
+        img.onload = () => {
+          loadedCount++;
+          setLoadProgress(Math.round((loadedCount / MOBILE_FRAME_COUNT) * 100));
 
-      const duration = video.duration;
-      const frames: ImageBitmap[] = [];
+          if (loadedCount === MOBILE_FRAME_COUNT) {
+            mobileImagesRef.current = images;
+            setLoaded(true);
+            drawFrame(0);
+          }
+        };
+        img.onerror = () => {
+          // Count errors as loaded to avoid hanging
+          loadedCount++;
+          if (loadedCount === MOBILE_FRAME_COUNT) {
+            mobileImagesRef.current = images;
+            setLoaded(true);
+            drawFrame(0);
+          }
+        };
+        images.push(img);
+      }
+    } else {
+      // ─── Desktop: extract frames from video into ImageBitmap cache ───
+      frameCountRef.current = DESKTOP_FRAME_COUNT;
+      let cancelled = false;
 
-      const offscreen = document.createElement("canvas");
-      offscreen.width = video.videoWidth;
-      offscreen.height = video.videoHeight;
-      const ctx = offscreen.getContext("2d");
-      if (!ctx) return;
+      async function extractFrames() {
+        const video = document.createElement("video");
+        video.src = "/paint-scroll.mp4";
+        video.muted = true;
+        video.playsInline = true;
+        video.preload = "auto";
+        video.crossOrigin = "anonymous";
 
-      for (let i = 0; i < frameCount; i++) {
-        if (cancelled) return;
-
-        video.currentTime = (i / (frameCount - 1)) * duration;
-        await new Promise<void>((resolve) => {
-          video.onseeked = () => resolve();
+        await new Promise<void>((resolve, reject) => {
+          video.onloadedmetadata = () => resolve();
+          video.onerror = () => reject(new Error("Video failed to load"));
         });
 
-        ctx.drawImage(video, 0, 0);
-        const bitmap = await createImageBitmap(offscreen);
-        frames.push(bitmap);
+        const duration = video.duration;
+        const frames: ImageBitmap[] = [];
+
+        const offscreen = document.createElement("canvas");
+        offscreen.width = video.videoWidth;
+        offscreen.height = video.videoHeight;
+        const ctx = offscreen.getContext("2d");
+        if (!ctx) return;
+
+        for (let i = 0; i < DESKTOP_FRAME_COUNT; i++) {
+          if (cancelled) return;
+
+          video.currentTime = (i / (DESKTOP_FRAME_COUNT - 1)) * duration;
+          await new Promise<void>((resolve) => {
+            video.onseeked = () => resolve();
+          });
+
+          ctx.drawImage(video, 0, 0);
+          const bitmap = await createImageBitmap(offscreen);
+          frames.push(bitmap);
+
+          if (!cancelled) {
+            setLoadProgress(Math.round(((i + 1) / DESKTOP_FRAME_COUNT) * 100));
+          }
+        }
 
         if (!cancelled) {
-          setLoadProgress(Math.round(((i + 1) / frameCount) * 100));
+          framesRef.current = frames;
+          setLoaded(true);
+          drawFrame(0);
         }
       }
 
-      if (!cancelled) {
-        framesRef.current = frames;
+      extractFrames().catch(() => {
+        // If extraction fails, show poster fallback
         setLoaded(true);
-        drawFrame(0);
-      }
+      });
+
+      return () => {
+        cancelled = true;
+      };
     }
-
-    extractFrames().catch(() => {
-      // If extraction fails (e.g. OOM on very old device), show poster fallback
-      setFallback(true);
-      setLoaded(true);
-    });
-
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
-  // ── Draw a cached frame to canvas ──
+  // ── Draw a frame to canvas ──
   const drawFrame = useCallback((index: number) => {
     const canvas = canvasRef.current;
-    const frames = framesRef.current;
-    if (!canvas || !frames.length) return;
+    if (!canvas) return;
 
-    const clamped = Math.max(0, Math.min(frames.length - 1, index));
-    if (clamped === lastFrameIndexRef.current) return;
+    if (isMobileRef.current) {
+      // Mobile: draw from preloaded Image elements
+      const images = mobileImagesRef.current;
+      if (!images.length) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+      const clamped = Math.max(0, Math.min(images.length - 1, index));
+      if (clamped === lastFrameIndexRef.current) return;
 
-    const frame = frames[clamped];
-    if (canvas.width !== frame.width || canvas.height !== frame.height) {
-      canvas.width = frame.width;
-      canvas.height = frame.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const img = images[clamped];
+      if (!img.complete || !img.naturalWidth) return;
+
+      if (
+        canvas.width !== img.naturalWidth ||
+        canvas.height !== img.naturalHeight
+      ) {
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+      }
+
+      ctx.drawImage(img, 0, 0);
+      lastFrameIndexRef.current = clamped;
+    } else {
+      // Desktop: draw from cached ImageBitmaps
+      const frames = framesRef.current;
+      if (!frames.length) return;
+
+      const clamped = Math.max(0, Math.min(frames.length - 1, index));
+      if (clamped === lastFrameIndexRef.current) return;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const frame = frames[clamped];
+      if (canvas.width !== frame.width || canvas.height !== frame.height) {
+        canvas.width = frame.width;
+        canvas.height = frame.height;
+      }
+
+      ctx.drawImage(frame, 0, 0);
+      lastFrameIndexRef.current = clamped;
     }
-
-    ctx.drawImage(frame, 0, 0);
-    lastFrameIndexRef.current = clamped;
   }, []);
 
   // ── Scroll handler ──
@@ -177,27 +244,18 @@ export default function VideoScrollSection() {
   return (
     <section ref={containerRef} className="relative h-[250vh]">
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
-        {/* Canvas for cached frames (both desktop and mobile) */}
+        {/* Canvas for scroll-driven frames (both desktop and mobile) */}
         <canvas
           ref={canvasRef}
           className="absolute inset-0 w-full h-full object-cover"
           style={{
             imageRendering: "auto",
-            opacity: loaded && !fallback ? 1 : 0,
+            opacity: loaded ? 1 : 0,
             transition: "opacity 0.6s ease",
           }}
         />
 
-        {/* Poster fallback for very old devices where frame extraction fails */}
-        {fallback && (
-          <img
-            src="/paint-scroll-poster.jpg"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        )}
-
-        {/* Loading state (frame extraction) */}
+        {/* Loading state */}
         {!loaded && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black">
             <div className="w-48 h-[1px] bg-white/10 rounded-full overflow-hidden">
