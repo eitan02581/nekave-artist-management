@@ -9,7 +9,9 @@ import {
   type ReactNode,
 } from "react";
 
-export type Locale = "en" | "he";
+export type Locale = "en" | "he" | "fr";
+
+const LOCALE_CYCLE: Locale[] = ["en", "he", "fr"];
 
 interface I18nContextType {
   locale: Locale;
@@ -70,7 +72,7 @@ const translations: Record<Locale, Record<string, string>> = {
       "Thank you for reaching out. We'll get back to you shortly.",
     "form.success.again": "Send another message",
 
-    // Language toggle
+    // Language toggle (shows the NEXT locale in the cycle: en → he)
     "lang.switch": "HE",
     "lang.flag": "🇮🇱",
   },
@@ -125,7 +127,63 @@ const translations: Record<Locale, Record<string, string>> = {
     "form.success.text": "תודה שפניתם אלינו. נחזור אליכם בהקדם.",
     "form.success.again": "שלח הודעה נוספת",
 
-    // Language toggle
+    // Language toggle (shows the NEXT locale in the cycle: he → fr)
+    "lang.switch": "FR",
+    "lang.flag": "🇫🇷",
+  },
+  fr: {
+    // Hero
+    "hero.subtitle": "GESTION D'ARTISTES",
+
+    // Scroll sections
+    "scroll.1.title": "Un Art Choisi\nAvec Intention",
+    "scroll.1.subtitle":
+      "Chaque œuvre de la collection NEKAVE est sélectionnée à la main. Choisie pour son savoir-faire, son histoire et sa valeur durable.",
+    "scroll.2.title": "De l'Émergent\nau Confirmé",
+    "scroll.2.subtitle":
+      "Une curation à travers une variété de styles et de gammes de prix, reliant les collectionneurs à des œuvres qui résonnent.",
+    "scroll.3.title": "Votre Art,\nVotre Vision",
+    "scroll.3.subtitle":
+      "Que vous commenciez une collection ou que vous l'enrichissiez, Ron travaille personnellement avec chaque client pour trouver la pièce idéale.",
+
+    // About
+    "about.eyebrow": "À propos",
+    "about.heading": "Curation de l'Exceptionnel",
+    "about.text":
+      "Ron Elnekave est un artiste et gestionnaire d'art qui se consacre à la recherche, la curation et le placement d'œuvres précieuses, à travers une variété de styles et de valeurs. Des voix émergentes aux maîtres confirmés, chaque pièce est choisie avec intention.",
+
+    // Contact
+    "contact.eyebrow": "Contact",
+    "contact.heading": "Prendre Contact",
+
+    // Footer
+    "footer.tagline": "Gestion et Curation d'Artistes",
+    "footer.copyright": "© 2026 NEKAVE Artists Management",
+
+    // Form
+    "form.name": "Nom",
+    "form.name.placeholder": "Votre nom",
+    "form.email": "E-mail",
+    "form.email.placeholder": "votre@email.com",
+    "form.phone": "Téléphone",
+    "form.phone.placeholder": "+33 6 00 00 00 00",
+    "form.subject": "Sujet",
+    "form.subject.placeholder": "Sélectionnez un sujet",
+    "form.subject.general": "Demande générale",
+    "form.subject.artist": "Demande artiste",
+    "form.subject.exhibition": "Demande exposition",
+    "form.subject.collector": "Demande collectionneur",
+    "form.subject.press": "Presse",
+    "form.message": "Message",
+    "form.message.placeholder": "Parlez-nous de votre demande...",
+    "form.submit": "Envoyer le message",
+    "form.submitting": "Envoi en cours...",
+    "form.success.title": "Message envoyé",
+    "form.success.text":
+      "Merci de nous avoir contactés. Nous reviendrons vers vous très prochainement.",
+    "form.success.again": "Envoyer un autre message",
+
+    // Language toggle (shows the NEXT locale in the cycle: fr → en)
     "lang.switch": "EN",
     "lang.flag": "🇬🇧",
   },
@@ -139,7 +197,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   // Load saved preference
   useEffect(() => {
     const saved = localStorage.getItem("nekave-lang") as Locale | null;
-    if (saved === "he" || saved === "en") {
+    if (saved && LOCALE_CYCLE.includes(saved)) {
       setLocale(saved);
     }
   }, []);
@@ -152,7 +210,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const toggleLocale = useCallback(() => {
     setLocale((prev) => {
-      const next = prev === "en" ? "he" : "en";
+      const idx = LOCALE_CYCLE.indexOf(prev);
+      const next = LOCALE_CYCLE[(idx + 1) % LOCALE_CYCLE.length];
       localStorage.setItem("nekave-lang", next);
       return next;
     });
