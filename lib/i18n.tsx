@@ -40,6 +40,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "about.heading": "Curating the Exceptional",
     "about.text":
       "Ron Elnekave is an artist and art manager dedicated to sourcing, curating, and placing precious works across a spectrum of styles and value. From emerging voices to established masters, every piece is chosen with intention.",
+    "bio.text":
+      "Ron Elnekave, born to parents who immigrated from France to Israel, was raised from a young age within a culture of history, museums, and art across the world. With proven leadership experience, he was a partner in significant work in the retail sector, and today he is dedicated to expanding the culture of art in Israel — guided by a deep Zionist outlook and a profound belief in art's importance to society.",
 
     // Contact
     "contact.eyebrow": "Contact",
@@ -96,6 +98,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "about.heading": "אוצרות את היוצא מן הכלל",
     "about.text":
       "רון אלנקווה הוא אמן ומנהל אמנות המקדיש את עבודתו לאיתור, אוצרות והצבת יצירות יקרות ערך במגוון סגנונות וערכים. מקולות מתחילים ועד אמנים מבוססים, כל יצירה נבחרת בכוונה.",
+    "bio.text":
+      "רון אלנקווה, בן להורים שעלו מצרפת לישראל, חונך מגיל צעיר לתרבות של היסטוריה, מוזיאונים ואמנות ברחבי העולם. עם ניסיון ניהולי מוכח, היה שותף לעשייה משמעותית בעסק בתחום הקמעונאות, וכיום פועל להרחבת תרבות האמנות בישראל מתוך השקפה ציונית עמוקה ואמונה בחשיבותה לחברה.",
 
     // Contact
     "contact.eyebrow": "צור קשר",
@@ -151,6 +155,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "about.heading": "Curation de l'Exceptionnel",
     "about.text":
       "Ron Elnekave est un artiste et gestionnaire d'art qui se consacre à la recherche, la curation et le placement d'œuvres précieuses, à travers une variété de styles et de valeurs. Des voix émergentes aux maîtres confirmés, chaque pièce est choisie avec intention.",
+    "bio.text":
+      "Ron Elnekave, fils de parents ayant émigré de France vers Israël, a été initié dès son plus jeune âge à une culture d'histoire, de musées et d'art à travers le monde. Fort d'une expérience de direction confirmée, il a été partenaire d'une activité significative dans le secteur de la vente au détail, et œuvre aujourd'hui à l'élargissement de la culture artistique en Israël, animé par une vision sioniste profonde et la conviction que l'art est essentiel à la société.",
 
     // Contact
     "contact.eyebrow": "Contact",

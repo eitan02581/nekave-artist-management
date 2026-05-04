@@ -67,14 +67,11 @@ export default function HomePage() {
       <section className="pt-24 md:pt-32">
         <div className="max-w-3xl mx-auto px-8 md:px-16 text-center">
           <ScrollReveal variant="fade-up">
-            <span className="inline-block rounded-full bg-charcoal/5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-charcoal mb-6">
+            <span className="inline-block rounded-full bg-charcoal/5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-charcoal/70 mb-8">
               {t("about.eyebrow")}
             </span>
-            <h2 className="font-display text-3xl md:text-4xl font-light text-black tracking-wide mb-8">
-              {t("about.heading")}
-            </h2>
             <p className="font-body text-base md:text-lg leading-relaxed text-charcoal/70">
-              {t("about.text")}
+              {t("bio.text")}
             </p>
           </ScrollReveal>
         </div>
