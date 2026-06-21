@@ -121,7 +121,7 @@ export default function Lightbox({
             </button>
           )}
 
-          {/* Image */}
+          {/* Image — drag/swipe horizontally to navigate (touch & mouse) */}
           <motion.div
             key={current.id}
             className="relative flex h-[82vh] w-[88vw] items-center justify-center"
@@ -129,6 +129,15 @@ export default function Lightbox({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.45, ease: EASE_GALLERY }}
             onClick={(e) => e.stopPropagation()}
+            drag={images.length > 1 ? "x" : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            dragMomentum={false}
+            onDragEnd={(_, info) => {
+              // Trigger on a deliberate distance OR a quick flick.
+              if (info.offset.x < -60 || info.velocity.x < -400) goNext();
+              else if (info.offset.x > 60 || info.velocity.x > 400) goPrev();
+            }}
           >
             <Image
               src={current.src}
