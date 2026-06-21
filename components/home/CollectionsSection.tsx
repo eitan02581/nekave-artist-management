@@ -12,7 +12,7 @@ export default function CollectionsSection({
   if (collections.length === 0) return null;
 
   return (
-    <section className="py-24 md:py-32">
+    <section id="collections" className="scroll-mt-12 py-24 md:py-32">
       <ScrollReveal variant="fade-up" className="text-center mb-16 md:mb-20">
         <span className="inline-block rounded-full bg-charcoal/5 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-charcoal/70">
           Collections

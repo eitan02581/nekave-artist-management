@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { motion } from "framer-motion";
 import HeroSection from "@/components/home/HeroSection";
 import BackgroundVideo from "@/components/home/BackgroundVideo";
 import VideoScrollSection from "@/components/home/VideoScrollSection";
@@ -64,6 +65,32 @@ export default function HomeClient({
             </p>
           </div>
         </div>
+
+        {/* Scroll-to-gallery cue */}
+        <a
+          href="#collections"
+          aria-label={t("hero.cta")}
+          className="group absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2"
+        >
+          <span className="font-body text-[10px] uppercase tracking-[0.25em] text-white/70 transition-colors duration-500 group-hover:text-white md:text-xs">
+            {t("hero.cta")}
+          </span>
+          <motion.svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-white/70 transition-colors duration-500 group-hover:text-white"
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </motion.svg>
+        </a>
       </HeroSection>
 
       {/* ─── Video Scroll Experience ─── */}

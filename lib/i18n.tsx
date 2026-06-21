@@ -23,6 +23,7 @@ const translations: Record<Locale, Record<string, string>> = {
   en: {
     // Hero
     "hero.subtitle": "ARTISTS MANAGEMENT",
+    "hero.cta": "View Gallery",
 
     // Scroll sections
     "scroll.1.title": "Art Chosen\nWith Intention",
@@ -81,6 +82,7 @@ const translations: Record<Locale, Record<string, string>> = {
   he: {
     // Hero
     "hero.subtitle": "ניהול אמנים",
+    "hero.cta": "לגלריה",
 
     // Scroll sections
     "scroll.1.title": "אמנות שנבחרה\nבקפידה",
@@ -138,6 +140,7 @@ const translations: Record<Locale, Record<string, string>> = {
   fr: {
     // Hero
     "hero.subtitle": "GESTION D'ARTISTES",
+    "hero.cta": "Voir la galerie",
 
     // Scroll sections
     "scroll.1.title": "Un Art Choisi\nAvec Intention",
