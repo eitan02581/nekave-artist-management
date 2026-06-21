@@ -4,6 +4,7 @@ import { useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import ZoomableImage from "@/components/ui/ZoomableImage";
 import type { CollectionImage } from "@/lib/types";
 
 interface LightboxProps {
@@ -132,32 +133,16 @@ export default function Lightbox({
               </button>
             )}
 
-            {/* Image — drag/swipe horizontally to navigate (touch & mouse) */}
+            {/* Image — pinch to zoom, double-tap to zoom, drag to pan when
+                zoomed, swipe left/right to navigate (all handled in one place) */}
             <motion.div
               key={current.id}
               className="relative h-full w-[92vw] md:w-[80vw]"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.45, ease: EASE_GALLERY }}
-              onClick={(e) => e.stopPropagation()}
-              drag={hasMany ? "x" : false}
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.15}
-              dragMomentum={false}
-              onDragEnd={(_, info) => {
-                // Trigger on a deliberate distance OR a quick flick.
-                if (info.offset.x < -60 || info.velocity.x < -400) goNext();
-                else if (info.offset.x > 60 || info.velocity.x > 400) goPrev();
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.35, ease: EASE_GALLERY }}
             >
-              <Image
-                src={current.src}
-                alt={current.alt}
-                fill
-                sizes="90vw"
-                className="object-contain"
-                priority
-              />
+              <ZoomableImage image={current} onPrev={goPrev} onNext={goNext} />
             </motion.div>
 
             {/* Next */}
