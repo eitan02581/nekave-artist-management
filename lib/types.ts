@@ -17,6 +17,20 @@ export interface Artist {
   works: Artwork[];
 }
 
+export interface CollectionImage {
+  id: string;
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+export interface Collection {
+  id: string;
+  title: string;
+  images: CollectionImage[];
+}
+
 export interface Exhibition {
   slug: string;
   title: string;
