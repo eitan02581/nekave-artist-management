@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
+import RetryImage from "@/components/ui/RetryImage";
 import { AnimatePresence, motion } from "framer-motion";
 import ZoomableImage from "@/components/ui/ZoomableImage";
 import type { CollectionImage } from "@/lib/types";
@@ -199,7 +199,7 @@ export default function Lightbox({
                         : "opacity-40 hover:opacity-80"
                     }`}
                   >
-                    <Image
+                    <RetryImage
                       src={image.src}
                       alt=""
                       fill

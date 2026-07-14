@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import RetryImage from "@/components/ui/RetryImage";
 import Lightbox from "@/components/ui/Lightbox";
 import type { Collection } from "@/lib/types";
 
@@ -93,7 +93,7 @@ export default function CollectionCarousel({
               aria-label={`Open ${image.alt}`}
               className="snap-start shrink-0 relative overflow-hidden bg-off-white cursor-pointer"
             >
-              <Image
+              <RetryImage
                 src={image.src}
                 alt={image.alt}
                 width={image.width}
