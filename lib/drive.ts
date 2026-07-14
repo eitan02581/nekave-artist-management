@@ -20,7 +20,6 @@ import type { Collection, CollectionImage } from "@/lib/types";
 const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 const DRIVE_FILES = "https://www.googleapis.com/drive/v3/files";
 const SCOPE = "https://www.googleapis.com/auth/drive.readonly";
-const THUMBNAIL_SIZE = "w1600"; // max width of the served thumbnail
 
 interface ServiceAccount {
   client_email: string;
@@ -143,7 +142,8 @@ function titleFromFolderName(name: string): string {
 function toImage(file: DriveFile): CollectionImage {
   return {
     id: file.id,
-    src: `https://drive.google.com/thumbnail?id=${file.id}&sz=${THUMBNAIL_SIZE}`,
+    // Size (`sz=wN`) is appended per rendered width by lib/drive-image-loader.
+    src: `https://drive.google.com/thumbnail?id=${file.id}`,
     alt: file.name.replace(/\.[^.]+$/, ""),
     // Real dimensions keep aspect ratios correct; fall back to portrait-ish.
     width: file.imageMediaMetadata?.width ?? 1200,

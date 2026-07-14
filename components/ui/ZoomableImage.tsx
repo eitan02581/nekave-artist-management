@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
+import driveImageLoader from "@/lib/drive-image-loader";
 import type { CollectionImage } from "@/lib/types";
 
 const MAX_SCALE = 4;
@@ -197,6 +198,7 @@ export default function ZoomableImage({ image, onPrev, onNext }: Props) {
         style={{ transformOrigin: "center center" }}
       >
         <Image
+          loader={driveImageLoader}
           src={image.src}
           alt={image.alt}
           width={image.width}

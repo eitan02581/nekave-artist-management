@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import driveImageLoader from "@/lib/drive-image-loader";
 import Lightbox from "@/components/ui/Lightbox";
 import type { Collection } from "@/lib/types";
 
@@ -94,6 +95,7 @@ export default function CollectionCarousel({
               className="snap-start shrink-0 relative overflow-hidden bg-off-white cursor-pointer"
             >
               <Image
+                loader={driveImageLoader}
                 src={image.src}
                 alt={image.alt}
                 width={image.width}

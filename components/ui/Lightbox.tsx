@@ -3,6 +3,7 @@
 import { useEffect, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import driveImageLoader from "@/lib/drive-image-loader";
 import { AnimatePresence, motion } from "framer-motion";
 import ZoomableImage from "@/components/ui/ZoomableImage";
 import type { CollectionImage } from "@/lib/types";
@@ -200,6 +201,7 @@ export default function Lightbox({
                     }`}
                   >
                     <Image
+                      loader={driveImageLoader}
                       src={image.src}
                       alt=""
                       fill
