@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import RetryImage from "@/components/ui/RetryImage";
+import Image from "next/image";
 import type { CollectionImage } from "@/lib/types";
 
 const MAX_SCALE = 4;
@@ -196,7 +196,7 @@ export default function ZoomableImage({ image, onPrev, onNext }: Props) {
         className="relative will-change-transform"
         style={{ transformOrigin: "center center" }}
       >
-        <RetryImage
+        <Image
           src={image.src}
           alt={image.alt}
           width={image.width}
