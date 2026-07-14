@@ -31,6 +31,7 @@ export default function Header() {
           alt="Nekave logo"
           width={56}
           height={56}
+          unoptimized
           className="h-14 w-14"
         />
         <div className="flex flex-col">

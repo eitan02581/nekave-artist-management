@@ -125,6 +125,7 @@ export default function HomeClient({
               alt="Nekave logo"
               width={320}
               height={320}
+              unoptimized
               className="w-52 h-52 md:w-72 md:h-72 lg:w-80 lg:h-80 mx-auto block"
             />
           </ScrollReveal>
