@@ -20,6 +20,15 @@ const WIDTHS = [
 
 const RETRIES = 3;
 
+// Raster types only — never SVG, which could execute scripts same-origin.
+const ALLOWED_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/avif",
+]);
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -45,10 +54,16 @@ export async function GET(
     } catch {
       continue; // transient network failure — retry
     }
-    if (res.ok && (res.headers.get("content-type") ?? "").startsWith("image/")) {
+    const type = (res.headers.get("content-type") ?? "")
+      .split(";")[0]
+      .trim()
+      .toLowerCase();
+    if (res.ok && ALLOWED_TYPES.has(type)) {
       return new Response(res.body, {
         headers: {
-          "Content-Type": res.headers.get("content-type") ?? "image/jpeg",
+          "Content-Type": type,
+          "X-Content-Type-Options": "nosniff",
+          "Content-Security-Policy": "default-src 'none'; sandbox",
           // Browser: 1 day. Vercel CDN: 1 year, serve stale while refreshing.
           "Cache-Control":
             "public, max-age=86400, s-maxage=31536000, stale-while-revalidate=86400",
